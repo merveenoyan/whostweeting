@@ -1,7 +1,7 @@
-#the classification problem is solved by svm
-#two different methods of vectorization are tested
-#being, tfidf and count vectorization
-#will be improved as I better myself in NLP
+#the classification problem is solved by svc and logistics regressor
+#two different methods of vectorization are tested, tfidf and count vectorizer
+#you can find better explanations in the google colab python notebook committed in the same repository
+
 
 
 import pandas as pd
@@ -12,6 +12,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from sklearn.linear_model import LogisticRegression
 
 #importing data
 tweetsdf = pd.read_table('/Users/Merveilleux/Desktop/tweets.txt', sep=',', names=('ID', 'Author', 'tweet'))
@@ -40,29 +43,54 @@ c_train=cvec.fit_transform(x_train)
 c_test=cvec.fit_transform(x_test)
 
 
-#svm applied on model based on tfidf
-svclassifier = SVC(kernel='linear')
+#classification applied with svc on tfidf data
+svclassifier = SVC(kernel='rbf')
 svclassifier.fit(t_train, y_train)
-t_pred = svclassifier.predict(t_test)
-
-#accuracy test and confusion matrix
-tfidfacc = accuracy_score(t_pred,y_test)
-print(confusion_matrix(y_test,t_pred))
-print(classification_report(y_test,t_pred))
+t_predsvc = svclassifier.predict(t_test)
 
 
-#svm applied on model based on count vectorizer
-svclassifier = SVC(kernel='linear')
+#classification applied with svc on count vec data
+svclassifier = SVC(kernel='rbf')
 svclassifier.fit(c_train, y_train)
-c_pred = svclassifier.predict(c_test)
+c_predsvc = svclassifier.predict(c_test)
 
-#accuracy test and confusion matrix
-countacc = accuracy_score(c_pred,y_test)
-print(confusion_matrix(y_test,c_pred))
-print(classification_report(y_test,c_pred))
+#accuracy score of svc with count vectorizer
+countsvcacc = accuracy_score(c_predsvc,y_test)
+print(confusion_matrix(y_test,c_predsvc))
+print(classification_report(y_test,c_predsvc))
+
+#accuracy score of svc with tfidf vectorizer
+tfidfsvmacc = accuracy_score(t_predsvc,y_test)
+print(confusion_matrix(y_test,t_predsvc))
+print(classification_report(y_test,t_predsvc))
+
+#classification applied with logistic regression on tfidf vec data
+logclassifier=LogisticRegression(random_state=0, solver='lbfgs')
+logclassifier.fit(t_train, y_train)
+t_predlog = logclassifier.predict(t_test)
+
+#classification applied with logistic regression on count vec data
+logclassifier=LogisticRegression(random_state=0, solver='lbfgs')
+logclassifier.fit(c_train, y_train)
+c_predlog = logclassifier.predict(c_test)
 
 
+#accuracy score of logistic regression with count vectorizer
+countlogacc = accuracy_score(c_predlog,y_test)
+print(confusion_matrix(y_test,c_predlog))
+print(classification_report(y_test,c_predlog))
 
-t_confmatrix = confusion_matrix(t_pred,y_test)
-c_confmatrix = confusion_matrix(c_pred,y_test)
 
+#accuracy score of logistic regression with tfidf vectorizer
+countlogacc = accuracy_score(t_predlog,y_test)
+print(confusion_matrix(y_test,t_predlog))
+print(classification_report(y_test,t_predlog))
+
+
+#confusion matrix for logistic regressor
+tlog_confmatrix = confusion_matrix(t_predlog,y_test)
+clog_confmatrix = confusion_matrix(c_predlog,y_test)
+
+#confusion matrix for svc
+tsvc_confmatrix = confusion_matrix(t_predsvc,y_test)
+csvc_confmatrix = confusion_matrix(c_predsvc,y_test)
